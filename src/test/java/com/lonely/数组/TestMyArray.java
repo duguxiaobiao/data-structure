@@ -135,4 +135,15 @@ public class TestMyArray {
         myArray.batchRemoveElement(51);
         System.out.println("批量删除51的：" + myArray);
     }
+
+    @Test
+    public void testRemoveAll(){
+        MyArray<Integer> myArray = new MyArray<>(10);
+        for (int i = 0; i < 10; i++) {
+            myArray.addLast((int)(Math.random()*100));
+        }
+        for (int i = 0; i < 10; i++) {
+            System.out.println(myArray.removeLast());
+        }
+    }
 }

@@ -280,7 +280,7 @@ public class MyArray<T> {
         T removeElement = this.data[index];
 
         //删除元素，指定索引后面的数据向前移动
-        for (int i = index; i < getSize(); i++) {
+        for (int i = index; i < getSize() - 1; i++) {
             this.data[i] = this.data[i + 1];
         }
         size--;
@@ -377,7 +377,7 @@ public class MyArray<T> {
         T[] newData = (T[]) new Object[newCapcity];
 
         //将原来的数组的值 复制到 新数组中
-        for (int i = 0; i < newCapcity; i++) {
+        for (int i = 0; i < getSize(); i++) {
             newData[i] = this.data[i];
         }
 
