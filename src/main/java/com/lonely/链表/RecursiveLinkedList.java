@@ -5,9 +5,9 @@ import java.text.MessageFormat;
 /**
  * @author ztkj-hzb
  * @Date 2019/6/19 14:13
- * @Description 链表实现 普通的带有虚拟头节点的实现
+ * @Description 基于递归的链表实现
  */
-public class LinkedList<T> implements  ILinkedList<T>{
+public class RecursiveLinkedList<T> implements ILinkedList<T>{
 
     /**
      * 虚拟头节点
@@ -20,7 +20,7 @@ public class LinkedList<T> implements  ILinkedList<T>{
     private int size;
 
 
-    public LinkedList() {
+    public RecursiveLinkedList() {
         this.dummyHead = new Node<>(null, null);
         size = 0;
     }
@@ -55,18 +55,9 @@ public class LinkedList<T> implements  ILinkedList<T>{
         if (index < 0 || index > size) {
             throw new RuntimeException(MessageFormat.format("index:{0}超出范围({1}~{2}),请检查..", index, 0, size));
         }
-
-        //通过index和首节点依次往下找，一直找到指定index位置的前一个元素
-        Node prevNode = this.dummyHead;
-        for (int i = 0; i < index; i++) {
-            prevNode = prevNode.next;
-        }
-
-        //已经获取到当前索引的上一个节点了
-        //注意这里需要先设置待新增的节点，然后在设置前一个节点，不能先设置前一个节点的下一个
-        Node addNode = new Node(t);
-        addNode.next = prevNode.next;
-        prevNode.next = addNode;
+        //获取待添加的节点的前一个节点
+        Node<T> preNode = index == 0 ? this.dummyHead : getNode(0, index - 1, this.dummyHead.next);
+        preNode.next = new Node<>(t, preNode.next);
         this.size++;
     }
 
@@ -78,20 +69,27 @@ public class LinkedList<T> implements  ILinkedList<T>{
      */
     @Override
     public T get(int index) {
+        return getNode(0, index, this.dummyHead.next).data;
+    }
 
+    /**
+     * 获取指定索引对应的节点
+     *
+     * @param start
+     * @param index
+     * @param currNode
+     * @return
+     */
+    private Node<T> getNode(int start, int index, Node<T> currNode) {
         if (index < 0 || index >= getSize()) {
             throw new IndexOutOfBoundsException(MessageFormat.format("下标越界，指定索引：{0}不在范围({1}~{2})中,请检查...", index, 0, getSize() - 1));
         }
-
-        Node<T> currNode = this.dummyHead.next;
-
-        //循环遍历获取对应索引的节点信息
-        for (int i = 0; i < index; i++) {
-            currNode = currNode.next;
+        if (start == index) {
+            return currNode;
         }
-
-        return currNode.data;
+        return getNode(start + 1, index, currNode.next);
     }
+
 
     /**
      * 获取第一个元素
@@ -119,17 +117,10 @@ public class LinkedList<T> implements  ILinkedList<T>{
      */
     @Override
     public void set(int index, T t) {
-
         if (index < 0 || index >= getSize()) {
             throw new IndexOutOfBoundsException(MessageFormat.format("下标越界，指定索引：{0}不在范围({1}~{2})中,请检查...", index, 0, getSize() - 1));
         }
-
-        Node currNode = dummyHead.next;
-        for (int i = 0; i < index; i++) {
-            currNode = currNode.next;
-        }
-
-        //找到了节点，设置内容的值
+        Node<T> currNode = this.getNode(0, index, this.dummyHead.next);
         currNode.data = t;
     }
 
@@ -164,23 +155,12 @@ public class LinkedList<T> implements  ILinkedList<T>{
             throw new IndexOutOfBoundsException(MessageFormat.format("下标越界，指定索引：{0}不在范围({1}~{2})中,请检查...", index, 0, getSize() - 1));
         }
 
-        Node preNode = this.dummyHead;
-        //循环找到待删除的索引的节点的前一个节点
-        for (int i = 0; i < index; i++) {
-            preNode = preNode.next;
-        }
-
-        //当前待删除的节点
-        Node<T> currNode = preNode.next;
-
-        //设置前一个节点的下一个节点为当前节点的下一个节点
-        preNode.next = currNode.next;
-
-        //设置当前节点的下一个为null
-        currNode.next = null;
-
+        //获取待删除的前一个元素
+        Node<T> preNode = index == 0 ? this.dummyHead : getNode(0, index - 1, this.dummyHead.next);
+        T removedata = preNode.next.data;
+        preNode.next = preNode.next.next;
         this.size--;
-        return currNode.data;
+        return removedata;
     }
 
     /**
