@@ -7,7 +7,7 @@ import java.text.MessageFormat;
  * @Date 2019/6/19 14:13
  * @Description 链表实现 普通的带有虚拟头节点的实现
  */
-public class LinkedList<T> implements  ILinkedList<T>{
+public class LinkedList<T> implements ILinkedList<T> {
 
     /**
      * 虚拟头节点
@@ -200,6 +200,35 @@ public class LinkedList<T> implements  ILinkedList<T>{
     public T removeLast() {
         return this.remove(getSize() - 1);
     }
+
+
+    /**
+     * 删除指定链表中第一个匹配到指定值的元素
+     *
+     * @param t
+     */
+    public void removeElementByFirst(T t) {
+        Node<T> firstNode = this.dummyHead.next;
+        if(firstNode == null){
+            return;
+        }
+        if(firstNode.data.equals(t)){
+            this.dummyHead.next = firstNode.next;
+            firstNode.next = null;
+            this.size--;
+            return;
+        }
+
+        while(firstNode.next != null){
+            if(firstNode.next.data.equals(t)){
+                firstNode.next = firstNode.next.next;
+                this.size--;
+                break;
+            }
+            firstNode = firstNode.next;
+        }
+    }
+
 
     /**
      * 获取链表节点大小

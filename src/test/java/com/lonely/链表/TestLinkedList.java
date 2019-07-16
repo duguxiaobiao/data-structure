@@ -77,4 +77,17 @@ public class TestLinkedList {
         System.out.println(linkedList);
     }
 
+
+    @Test
+    public void testRemoveEleByFirst(){
+        LinkedList<Integer> linkedList = this.buildDatas();
+        linkedList.addLast(120);
+
+        System.out.println(linkedList);
+
+        //删除元素
+        linkedList.removeElementByFirst(120);
+        System.out.println(linkedList);
+    }
+
 }
