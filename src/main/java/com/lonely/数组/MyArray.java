@@ -36,6 +36,16 @@ public class MyArray<T> {
         }
     }
 
+
+    public MyArray(T[] arr) {
+        this.data = (T[]) new Object[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            this.data[i] = arr[i];
+        }
+        this.size = arr.length;
+    }
+
+
     /**
      * 获取数组中实际空间大小
      *
@@ -395,5 +405,21 @@ public class MyArray<T> {
         if (index < 0 || index >= getSize()) {
             throw new IndexOutOfBoundsException(MessageFormat.format("下标:{0}越界，不在范围({1}~{2})中", index, 0, getSize()));
         }
+    }
+
+
+    /**
+     * 将两个索引位置的元素交换
+     *
+     * @param needSwapIndex
+     * @param toSwapIndex
+     */
+    public void swap(int needSwapIndex, int toSwapIndex) {
+        if (needSwapIndex < 0 || toSwapIndex < 0 || needSwapIndex > (this.size - 1) || toSwapIndex > (this.size - 1)) {
+            throw new RuntimeException("交换索引异常，请检查");
+        }
+        T data = this.data[needSwapIndex];
+        this.data[needSwapIndex] = this.data[toSwapIndex];
+        this.data[toSwapIndex] = data;
     }
 }
