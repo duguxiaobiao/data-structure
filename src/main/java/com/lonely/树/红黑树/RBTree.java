@@ -1,13 +1,15 @@
-package com.lonely.映射;
+package com.lonely.树.红黑树;
+
+import com.lonely.映射.Map;
 
 import java.text.MessageFormat;
 
 /**
  * @author ztkj-hzb
  * @Date 2019/7/17 15:29
- * @Description 基于二分搜索树实现的映射
+ * @Description 基于二分搜索树实现的红黑树
  */
-public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
+public class RBTree<K extends Comparable<K>, V> implements Map<K, V> {
 
     private int size;
 
@@ -22,7 +24,80 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
      */
     @Override
     public void put(K key, V value) {
-        this.add(key, value, this.root);
+        this.root = this.add(key, value, this.root);
+        root.color = BLACK;
+    }
+
+    /**
+     * 判断当前节点的是否是红色
+     * @param node
+     * @return
+     */
+    private boolean isRed(Node node){
+        if(node == null){
+            return BLACK;
+        }
+        return node.color;
+    }
+
+    /**
+     * 左旋转
+     *
+     * @param node
+     * @return
+     */
+    private Node leftRotation(Node node) {
+        if (node == null) {
+            return null;
+        }
+
+        //旋转过程
+        Node rightNode = node.right;
+        node.right = rightNode.left;
+        rightNode.left = node;
+
+        //设置颜色
+        rightNode.color = node.color;
+        node.color = RED;
+
+        return rightNode;
+    }
+
+    /**
+     * 右旋转
+     *
+     * @param node
+     * @return
+     */
+    private Node rightRotation(Node node) {
+        if (node == null) {
+            return node;
+        }
+
+        //旋转
+        Node leftNode = node.left;
+        node.left = leftNode.right;
+        leftNode.right = node;
+
+        //变更颜色
+        leftNode.color = node.color;
+        node.color = RED;
+
+        //翻转颜色
+        flipColor(leftNode);
+
+        return leftNode;
+    }
+
+    /**
+     * 翻转颜色
+     *
+     * @param node
+     */
+    private void flipColor(Node node) {
+        node.color = RED;
+        node.left.color = BLACK;
+        node.right.color = BLACK;
     }
 
     /**
@@ -35,7 +110,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
      */
     private Node add(K key, V value, Node node) {
         if (node == null) {
-            node = new Node(key, value, null, null);
+            node = new Node(key, value);
             if (this.size == 0) {
                 this.root = node;
             }
@@ -52,6 +127,24 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
             //已存在相同的key，覆盖操作
             node.value = value;
         }
+
+
+        //旋转和颜色的变化
+        //左旋转
+        if(isRed(node.right) && !isRed(node.left)){
+            leftRotation(node);
+        }
+
+        //右旋转
+        if(isRed(node.left) && isRed(node.left.left)){
+            rightRotation(node);
+        }
+
+        //变化颜色
+        if(isRed(node.left) && isRed(node.right)){
+            flipColor(node);
+        }
+
         return node;
     }
 
@@ -276,7 +369,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
     @Override
     public String toString() {
         StringBuilder message = new StringBuilder();
-        message.append("***BSTMap:{");
+        message.append("***RBTree:{");
         message.append(this.inOrder());
         message.append("}***");
         return message.toString();
@@ -305,27 +398,36 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
         return message.toString();
     }
 
+    /**
+     * 红黑树的节点颜色
+     */
+    private static final boolean RED = true;
+    private static final boolean BLACK = false;
+
     private class Node {
 
-        K key;
-        V value;
+        public K key;
+        public V value;
+        public Node left;
+        public Node right;
 
-        Node left;
-        Node right;
+        //是否是红色
+        public boolean color;
 
-        public Node(K key, V value, Node left, Node right) {
+        public Node(K key, V value, Node left, Node right, boolean color) {
             this.key = key;
             this.value = value;
             this.left = left;
             this.right = right;
+            this.color = color;
         }
 
         public Node(K key, V value) {
-            this(key, value, null, null);
+            this(key, value, null, null, BLACK);
         }
 
         public Node() {
-            this(null, null, null, null);
+            this(null, null, null, null, BLACK);
         }
 
         @Override
